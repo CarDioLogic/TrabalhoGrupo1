@@ -63,6 +63,52 @@ namespace AtecTrabalhoGrupo1
         }
 
 
+        public void Pagamento()
+        {
+            bool escolhaVálida;
+            int id;
+
+            do
+            {
+                Interface.MostrarListaFuncionários();
+
+                Console.WriteLine("\nDigite o Id do funcionário para fazer pagamento:");
+                string escolhaString = Console.ReadLine();
+
+                escolhaVálida = ValidarInput(escolhaString);
+
+                if(escolhaVálida == true)
+                {
+                    //Lógica para fazr pagamento ao funcionário!!
+                }
+
+            } while (escolhaVálida == false);
+        }
+
+        //Metódo para validar inputs de ID de funcionários na lista
+        public static bool ValidarInput(string escolhaString)
+        {
+            int idInput;
+            bool escolhaVálida = int.TryParse(escolhaString, out idInput);
+
+            if (escolhaVálida == false)
+            {
+                //Erro!
+                Console.WriteLine("Escolha inválida! Digite um valor númerico!");
+                Console.ReadLine();
+            }
+            else if (!Empresa.funcionarios.Any(func => func.Id == idInput))
+            {
+                //Erro!
+                escolhaVálida = false;
+
+                Console.WriteLine("Id escolhido não existe!");
+                Console.ReadLine();
+            }
+
+            return escolhaVálida;
+        }
+
         public string CriarConteudo(string empresaNome, int numFuncionários, decimal despesaSalários)
         {
             string conteudo = "";

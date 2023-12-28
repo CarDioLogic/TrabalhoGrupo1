@@ -18,7 +18,8 @@
                     4 - Remover Empregado.
                     5 - Alocar horário a empregado.
                     6 - Ver Empregados sem horário.
-                    7 - Sair da aplicação." +
+                    7 - Pagamento a Funcionário.
+                    8 - Sair da aplicação." +
                     "\nEscolhe uma opção:");
 
                 string escolhaString = Console.ReadLine();
@@ -49,10 +50,15 @@
                                 RemoverFuncionário();
                                 break;
                             case 5:
+                                //sadasadasd
                                 break;
                             case 6:
                                 break;
                             case 7:
+                                
+
+                                break;
+                            case 8:
                                 Console.WriteLine("A sair da aplicação...");
                                 Console.ReadLine();
                                 break;
@@ -124,7 +130,6 @@
             Console.ReadLine();
             Console.Clear();
         }
-
         public static void RemoverFuncionário()
         {
             bool escolhaVálida;
@@ -135,30 +140,16 @@
                 MostrarListaFuncionários();
 
                 Console.WriteLine("\nDigite o Id do funcionário para remover:");
-
                 string escolhaString = Console.ReadLine();
-                escolhaVálida = int.TryParse(escolhaString, out id);
 
-                if(escolhaVálida == false)
-                {
-                    //Erro!
-                    Console.WriteLine("Escolha inválida! Digite um valor númerico!");
-                    Console.ReadLine();
-                }
-                else if(!Empresa.funcionarios.Any(func => func.Id == id))
-                {
-                    //Erro!
-                    escolhaVálida = false;
+                escolhaVálida = Metodos.ValidarInput(escolhaString);
 
-                    Console.WriteLine("Id escolhido não existe!");
-                    Console.ReadLine();
-                }
-                else 
+                if (escolhaVálida == true)
                 {
+                    //Lógica para remover funcionário.
                     Funcionario funcionarioParaRemover = Empresa.funcionarios.Where(func => func.Id == id).FirstOrDefault();
                     Empresa.funcionarios.Remove(funcionarioParaRemover);
                 }
-
             } while (escolhaVálida == false);
         }
     }
