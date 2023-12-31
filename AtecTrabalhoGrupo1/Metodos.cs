@@ -15,58 +15,124 @@ namespace AtecTrabalhoGrupo1
             Console.ReadLine();
         }
         
-
-        //metodo recebe 2 argumentos: 1 funcionario e 1 preferencia horario que tem como default a tipologia Laboral
-        public void AlocarHorário(Funcionario funcionario, Funcionario.TipologiaDisponibilidade preferênciaHorário = Funcionario.TipologiaDisponibilidade.Laboral)
+        public static Funcionario AlocarHorário(Funcionario funcionario)
         {
+            if(funcionario.Disponibilidade == Funcionario.TipologiaDisponibilidade.Ambas)
+            {
+                bool escolhaVálida;
+                int escolha;
+
+                do
+                {
+                    Console.WriteLine("O funcionário tem disponibilade para ambos horários! Qual a preferência de horário - 1 (Laboral) ou 2 (Pós-Laboral):");
+                    string escolhaString = Console.ReadLine();
+                    escolhaVálida = int.TryParse(escolhaString, out escolha);
+
+                    if (escolhaVálida == true)
+                    {
+                        if (escolha == 1 || escolha == 2)
+                        {
+                            switch (escolha)
+                            {
+                                case 1:
+                                    funcionario.Turno = Funcionario.TipologiaHorário.Laboral;
+                                    break;
+                                case 2:
+                                    funcionario.Turno = Funcionario.TipologiaHorário.PosLaboral;
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            //Erro!
+                            escolhaVálida = false;
+
+                            Console.WriteLine("Escolha uma opção/número entre 1-2!");
+                            Console.ReadLine();
+                        }
+                    }
+                    else
+                    {
+                        //Erro!
+                        Console.WriteLine("Escolha inválida! Digite um valor númerico!");
+                        Console.ReadLine();
+                    }
+                } while (escolhaVálida == false);
+            }
+
+            //Alocar Horário semanal em array para cronograma
             if(funcionario != null)
             {
-                //para horário laboral
                 if (funcionario.Disponibilidade == Funcionario.TipologiaDisponibilidade.Laboral || 
-                    (funcionario.Disponibilidade == Funcionario.TipologiaDisponibilidade.Ambas && preferênciaHorário == Funcionario.TipologiaDisponibilidade.Laboral))
+                    (funcionario.Disponibilidade == Funcionario.TipologiaDisponibilidade.Ambas && funcionario.Turno == Funcionario.TipologiaHorário.Laboral))
                 {
-                    foreach(var day in funcionario.HorárioSemanal)
+                    for (int i = 0; i < funcionario.HorárioSemanal.Length; i++)
                     {
-                        day.InicioTurno = DateTime.MinValue + new TimeSpan(10, 0, 0); //hh, mm, ss
-                        day.FimTurno = DateTime.MinValue + new TimeSpan(18, 0, 0);
-                    };
-                }
+                        funcionario.HorárioSemanal[i] = new Horário();
 
-                //para horário pós-laboral
-                if (funcionario.Disponibilidade == Funcionario.TipologiaDisponibilidade.PosLaboral ||
-                (funcionario.Disponibilidade == Funcionario.TipologiaDisponibilidade.Ambas && preferênciaHorário == Funcionario.TipologiaDisponibilidade.PosLaboral))
-                {
-                    foreach (var day in funcionario.HorárioSemanal)
-                    {
-                        day.InicioTurno = DateTime.MinValue + new TimeSpan(18, 0, 0);
-                        day.FimTurno = DateTime.MinValue + new TimeSpan(00, 0, 0);
-                    };
+                        funcionario.HorárioSemanal[i].InicioTurno = DateTime.MinValue + new TimeSpan(10, 0, 0);
+                        funcionario.HorárioSemanal[i].FimTurno = DateTime.MinValue + new TimeSpan(18, 0, 0);
+                    }
                 }
+                if (funcionario.Disponibilidade == Funcionario.TipologiaDisponibilidade.PosLaboral ||
+                (funcionario.Disponibilidade == Funcionario.TipologiaDisponibilidade.Ambas && funcionario.Turno == Funcionario.TipologiaHorário.PosLaboral))
+                {
+                    for (int i = 0; i < funcionario.HorárioSemanal.Length; i++)
+                    {
+                        funcionario.HorárioSemanal[i] = new Horário();
+
+                        funcionario.HorárioSemanal[i].InicioTurno = DateTime.MinValue + new TimeSpan(18, 0, 0);
+                        funcionario.HorárioSemanal[i].FimTurno = DateTime.MinValue + new TimeSpan(00, 0, 0);
+                    }
+                }  
             }
+
+            return funcionario;
         }
 
-        //TESTAR ESTE METODO!!!!! IMPORTANTE!!!
-        public List<Funcionario> FuncionariosSemHorário(List<Funcionario> funcionarios)
+        public static decimal CalcularSalarioMensal(decimal salarioPorHora, Funcionario.TipologiaHorário turno)
         {
+            if (turno == Funcionario.TipologiaHorário.Laboral)
+            {
+                decimal salarioMensal = (salarioPorHora * 8) * 23;
+                return salarioMensal;
+            }
+            else if (turno == Funcionario.TipologiaHorário.PosLaboral)
+            {
+                decimal salarioMensal = (salarioPorHora * 5) * 23;
+                return salarioMensal;
+            }
+
+            return 0;
+        }
+
+        public static List<Funcionario> FuncionariosSemHorário()
+        {
+            List<Funcionario> funcionarios = Empresa.funcionarios;
             List<Funcionario> funcionáriosSemHorário = new List<Funcionario>();
 
             foreach(var funcionario in funcionarios)
             {
-                //|| funcionario.HorárioSemanal == default(DateTime) || horario.FimTurno == default(DateTime)
-                if (funcionario.HorárioSemanal == null )
+                if (funcionario.Turno == Funcionario.TipologiaHorário.NãoDefinido )
                 {
                     funcionáriosSemHorário.Add(funcionario);
                 }
             }
+            if(funcionáriosSemHorário.Count == 0)
+            {
+                Console.WriteLine("Não existem funcionários sem horário!");
+            }
 
-            return funcionarios;
+            return funcionáriosSemHorário;
         }
 
-
-        public void Pagamento()
+        public static decimal PagamentoPorFuncionário()
         {
             bool escolhaVálida;
             int id;
+
+            decimal salárioAPagar = 0;
+            decimal bonusMensal = 100;
 
             do
             {
@@ -75,20 +141,27 @@ namespace AtecTrabalhoGrupo1
                 Console.WriteLine("\nDigite o Id do funcionário para fazer pagamento:");
                 string escolhaString = Console.ReadLine();
 
-                escolhaVálida = ValidarInput(escolhaString);
+                (escolhaVálida, id) = ValidarIdDoFuncionário(escolhaString);
 
                 if(escolhaVálida == true)
                 {
-                    //Lógica para fazr pagamento ao funcionário!!
-                }
+                    Funcionario funcionario = Empresa.funcionarios.Where(f => f.Id == id).FirstOrDefault();
+                    salárioAPagar = funcionario.SalárioMensal;
 
+                    if(funcionario.BonusMensal == true)
+                    {
+                        salárioAPagar += bonusMensal;
+                    }
+                }
             } while (escolhaVálida == false);
+
+            return salárioAPagar;
         }
 
         //Metódo para validar inputs de ID de funcionários na lista
-        public static bool ValidarInput(string escolhaString)
+        public static (bool, int) ValidarIdDoFuncionário(string escolhaString)
         {
-            int idInput;
+            int idInput = -1;
             bool escolhaVálida = int.TryParse(escolhaString, out idInput);
 
             if (escolhaVálida == false)
@@ -106,24 +179,32 @@ namespace AtecTrabalhoGrupo1
                 Console.ReadLine();
             }
 
-            return escolhaVálida;
+            return (escolhaVálida, idInput);
         }
 
-        public string CriarConteudo(string empresaNome, int numFuncionários, decimal despesaSalários)
+        public static string CriarConteudo()
         {
-            string conteudo = "";
-            conteudo = "Secção Empresa:\n" +
-                $"Nome da Empresa: {empresaNome}\n" +
-                $"Nº de Funcionários: {numFuncionários}" +
-                $"Despesas saláriais: {despesaSalários}";
+            string nomeDaEmpresa = Empresa.nome;
+            int totalFuncionários = Empresa.ObterNúmeroTotalDeFuncionários(Empresa.funcionarios);
+            decimal despesasSaláriais = Empresa.DespesaSalários(Empresa.funcionarios);
 
-            //Talvez uma secção para escrever a lista de funcionários!
+            string conteudo = "";
+
+            conteudo = "Secção Empresa:\n" +
+                $"Nome da Empresa: {nomeDaEmpresa}\n" +
+                $"Nº de Funcionários: {totalFuncionários}\n" +
+                $"Despesas saláriais: {despesasSaláriais}\n";
 
             return conteudo;
         }
 
-        public void GuardarDados(string conteudo, string filePath)
+        public static void GuardarDados(string conteudo)
         {
+            conteudo += $"\nDados guardados a: {DateTime.Now}";
+
+            Console.WriteLine("Escreva o directorio do ficheiro onde pretende guardar os detalhes da empresa");
+            string filePath = Console.ReadLine();
+
             try
             {
                 File.WriteAllText(filePath, conteudo);
@@ -138,8 +219,11 @@ namespace AtecTrabalhoGrupo1
             Console.ReadLine();
         }
 
-        static string LerFicheiro(string filePath)
+        public static string LerFicheiro()
         {
+            Console.WriteLine("Escreva o directorio do ficheiro de onde pretende ler os detalhes da empresa");
+            string filePath = Console.ReadLine();
+
             try
             {
                 return File.ReadAllText(filePath);
@@ -152,8 +236,5 @@ namespace AtecTrabalhoGrupo1
                 return string.Empty;
             }
         }
-
-
-
     }
 }

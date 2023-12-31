@@ -7,35 +7,56 @@ namespace AtecTrabalhoGrupo1
         public static string nome = "ADOSMELHORES";
 
         public static List<Funcionario> funcionarios = CriarListaDeFuncionáriosInicial();
+        public static List<Funcionario> antigosFuncionários = new List<Funcionario>();
 
         //Funções
         public static List<Funcionario> CriarListaDeFuncionáriosInicial()
         {
             List<Funcionario> funcionarios = new List<Funcionario>()
             {
-                new Funcionario // definir empregado
+                new Funcionario
                 {
                     Id = 1,
                     Nome = "João",
-                    Morada = "Rua das Costouras",
-                    FimDeContrato = 2021,
-                    DataDeRegistoCriminal = 2023,
-                    IsençaoDeBonus = true,
-                    BonusMensal = true,
+                    Morada = "Rua das Arnelas, Nº520; Canedo",
+                    DataDeRegistoCriminal = new DateTime(2023, 1, 15, 14, 30, 0),
                     CarroDaEmpresa = true,
-                    Salário = 1000,
+                    SalárioPorHora = 7,
+                    Disponibilidade = Funcionario.TipologiaDisponibilidade.PosLaboral,
+                    Turno = Funcionario.TipologiaHorário.PosLaboral,
+                    SalárioMensal = Metodos.CalcularSalarioMensal(7, Funcionario.TipologiaHorário.PosLaboral),
+                    ÈChefe = false,
+                    Area = Funcionario.Areas.IT,
+                    SupervisorId = 2, 
                 },
-                new Funcionario // definir empregado
+                new Funcionario
                 {
                     Id = 2,
-                    Nome = "ANA",
-                    Morada = "Rua das Costouras",
-                    FimDeContrato = 2021,
-                    DataDeRegistoCriminal = 2023,
-                    IsençaoDeBonus = true,
-                    BonusMensal = true,
+                    Nome = "Ana",
+                    Morada = "Rua da Fontainha, Nº210; Arnelas",
+                    DataDeRegistoCriminal = new DateTime(2023, 5, 20, 14, 30, 0),
                     CarroDaEmpresa = true,
-                    Salário = 1000,
+                    SalárioPorHora = 9,
+                    Disponibilidade = Funcionario.TipologiaDisponibilidade.Laboral,
+                    Turno = Funcionario.TipologiaHorário.Laboral,
+                    SalárioMensal = Metodos.CalcularSalarioMensal(7, Funcionario.TipologiaHorário.Laboral),
+                    ÈChefe = true,
+                    Area = Funcionario.Areas.IT
+                },
+                new Funcionario
+                {
+                    Id = 3,
+                    Nome = "Miguel",
+                    Morada = "Rua das Ruas, Nº110; Canelas",
+                    DataDeRegistoCriminal = new DateTime(2023, 8, 20, 14, 30, 0),
+                    CarroDaEmpresa = true,
+                    SalárioPorHora = 8,
+                    Disponibilidade = Funcionario.TipologiaDisponibilidade.Ambas,
+                    Turno = Funcionario.TipologiaHorário.NãoDefinido,
+                    //SalárioMensal só é calculado depois de turno/horario ser definido!
+                    ÈChefe = false,
+                    Area = Funcionario.Areas.IT,
+                    SupervisorId = 2,
                 }
 
             };
@@ -43,53 +64,11 @@ namespace AtecTrabalhoGrupo1
             return funcionarios;
         }
 
-
         public static int ObterNúmeroTotalDeFuncionários(List<Funcionario> funcionarios)
         {
             int totalFuncionários = funcionarios.Count;
             return totalFuncionários;
         }
-
-
-
-        //MetodoRodrigo
-        public void calcularSalario(Funcionario funcionario, Funcionario.Disponibilidade preferenciaHorario = Funcionario.Disponibilidade.Laboral)
-        {
-            if (funcionario.Disp == Funcionario.Disponibilidade.Laboral)
-            {
-                decimal salarioMensal = (funcionario.ValorHora * 8) * 23;   //Calculo valor mensal
-                funcionario.ValorMensal = salarioMensal;    //Guarda o valor mensal do funcionario
-            }
-
-            else if (funcionario.Disp == Funcionario.Disponibilidade.PosLaboral)
-            {
-                decimal salarioMensal = (funcionario.ValorHora * 5) * 23;
-                funcionario.ValorMensal = salarioMensal;
-            }
-
-            else
-            {
-                if (preferenciaHorario == Funcionario.Disponibilidade.Laboral)
-                {
-                    foreach (var dia in funcionario.HorariosSemanal)
-                    {
-                        decimal salarioMensal = (funcionario.ValorHora * 8) * 23;
-                        funcionario.ValorMensal = salarioMensal;
-                    }
-                }
-
-                else if (preferenciaHorario == Funcionario.Disponibilidade.PosLaboral)
-                {
-                    foreach (var dia in funcionario.HorariosSemanal)
-                    {
-                        decimal salarioMensal = (funcionario.ValorHora * 5) * 23;
-                        funcionario.ValorMensal = salarioMensal;
-                    }
-                }
-            }
-        }
-        //metodo
-
 
         public static decimal DespesaSalários(List<Funcionario> funcionarios)
         {
@@ -97,7 +76,7 @@ namespace AtecTrabalhoGrupo1
 
             foreach (var funcionario in funcionarios)
             {
-                total += funcionario.Salário;
+                total += funcionario.SalárioMensal;
             }
 
             return total;
