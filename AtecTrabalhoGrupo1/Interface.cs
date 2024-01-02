@@ -124,7 +124,7 @@ namespace AtecTrabalhoGrupo1
                     Console.ReadLine();
                     Console.Clear();
                 }
-            } while(escolhaVálida == false || escolha != 7);
+            } while(escolhaVálida == false || escolha != 10);
         }
 
 
